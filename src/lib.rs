@@ -15,7 +15,17 @@ use signal_frame::signal_channel;
 pub use signal_harness::HarnessDaemonConfiguration;
 
 #[derive(
-    Archive, RkyvSerialize, RkyvDeserialize, Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord,
+    Archive,
+    RkyvSerialize,
+    RkyvDeserialize,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord,
 )]
 pub struct ConfigurationGeneration(u64);
 
@@ -111,7 +121,14 @@ signal_channel! {
     }
 }
 
-impl From<HarnessDaemonConfiguration> for Operation {
+pub type MetaHarnessRequest = Operation;
+pub type MetaHarnessFrame = Frame;
+pub type MetaHarnessFrameBody = FrameBody;
+pub type MetaHarnessRequestBuilder = RequestBuilder;
+pub type ChannelRequest = Operation;
+pub type ChannelReply = MetaHarnessReply;
+
+impl From<HarnessDaemonConfiguration> for MetaHarnessRequest {
     fn from(payload: HarnessDaemonConfiguration) -> Self {
         Self::Configure(payload)
     }
