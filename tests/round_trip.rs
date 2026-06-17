@@ -47,7 +47,7 @@ impl MetaHarnessFixture {
 
     fn round_trip_request(&self, request: Operation) -> Operation {
         let frame = MetaHarnessFrame::new(MetaHarnessFrameBody::Request {
-            exchange: self.exchange.clone(),
+            exchange: self.exchange,
             request: request.clone().into_request(),
         });
         let bytes = frame.encode_length_prefixed().expect("encode request");
@@ -60,7 +60,7 @@ impl MetaHarnessFixture {
 
     fn round_trip_reply(&self, reply: MetaHarnessReply) -> MetaHarnessReply {
         let frame = MetaHarnessFrame::new(MetaHarnessFrameBody::Reply {
-            exchange: self.exchange.clone(),
+            exchange: self.exchange,
             reply: Reply::committed(NonEmpty::single(SubReply::Ok(reply.clone()))),
         });
         let bytes = frame.encode_length_prefixed().expect("encode reply");
