@@ -4,14 +4,16 @@ use meta_signal_harness::{
     Operation, OperationKind, RequestUnimplemented, UnimplementedReason,
 };
 #[cfg(feature = "nota-text")]
-use nota_next::{NotaEncode, NotaSource};
+use nota::{NotaEncode, NotaSource};
 use signal_frame::{
     ExchangeIdentifier, ExchangeLane, LaneSequence, NonEmpty, Reply, RequestPayload, SessionEpoch,
     SignalOperationHeads, SubReply,
 };
-use signal_harness::{HarnessInstanceConfiguration, HarnessKind, HarnessName};
-use signal_persona::origin::{OwnerIdentity, UnixUserIdentifier};
-use signal_persona::{SocketMode, WirePath};
+use signal_harness::{HarnessInstanceConfiguration, HarnessKind, HarnessName, TerminalSocketPath};
+use signal_persona::{
+    DomainSocketMode, DomainSocketPath, EngineManagementSocketMode, EngineManagementSocketPath,
+    OwnerIdentity,
+};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 struct MetaHarnessFixture {
@@ -31,15 +33,17 @@ impl MetaHarnessFixture {
 
     fn configuration(&self) -> HarnessDaemonConfiguration {
         HarnessDaemonConfiguration {
-            harness_socket_path: WirePath::new("/run/persona/harness.sock"),
-            harness_socket_mode: SocketMode::new(0o600),
-            supervision_socket_path: WirePath::new("/run/persona/harness-supervision.sock"),
-            supervision_socket_mode: SocketMode::new(0o600),
-            owner_identity: OwnerIdentity::UnixUser(UnixUserIdentifier::new(1000)),
+            domain_socket_path: DomainSocketPath::new("/run/persona/harness.sock"),
+            domain_socket_mode: DomainSocketMode::new(0o600),
+            engine_management_socket_path: EngineManagementSocketPath::new(
+                "/run/persona/harness-supervision.sock",
+            ),
+            engine_management_socket_mode: EngineManagementSocketMode::new(0o600),
+            owner_identity: OwnerIdentity::unix_user(1000),
             harnesses: vec![HarnessInstanceConfiguration {
                 harness_name: HarnessName::new("designer"),
                 harness_kind: HarnessKind::Codex,
-                terminal_socket_path: Some(WirePath::new("/run/persona/terminal.sock")),
+                terminal_socket_path: Some(TerminalSocketPath::new("/run/persona/terminal.sock")),
                 pi_rpc_adapter: None,
             }],
         }

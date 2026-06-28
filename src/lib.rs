@@ -9,7 +9,7 @@
 //! binary startup message, and later reconfiguration arrives over this meta
 //! plane as the same typed record, never as flags.
 
-use nota_next::{Block, NotaBlock, NotaDecode, NotaDecodeError, NotaEncode};
+use nota::{Block, NotaBlock, NotaDecode, NotaDecodeError, NotaEncode};
 use rkyv::{Archive, Deserialize as RkyvDeserialize, Serialize as RkyvSerialize};
 use signal_frame::signal_channel;
 pub use signal_harness::HarnessDaemonConfiguration;
