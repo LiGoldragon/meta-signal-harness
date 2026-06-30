@@ -8,7 +8,6 @@ Before editing, read:
 - `~/primary/skills/component-triad.md`
 - `~/primary/skills/architectural-truth-tests.md`
 - `~/primary/skills/nix-discipline.md`
-- this repo's `INTENT.md`
 - this repo's `ARCHITECTURE.md`
 - `../signal-harness/ARCHITECTURE.md`
 - `../harness/ARCHITECTURE.md`

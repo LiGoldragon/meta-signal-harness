@@ -9,6 +9,17 @@
 delivery, interaction, status, transcript, and lifecycle observation traffic
 stays in `signal-harness`.
 
+## Direction
+
+This repo is the second leg of the harness contract pair. Every Persona
+component has exactly two contracts: the ordinary `signal-<component>` working
+signal and the meta `meta-signal-<component>` policy signal. `meta-signal-harness`
+is the authority surface the Persona manager uses to configure the
+`harness-daemon`; before it, `harness` had only its ordinary contract. Daemon
+configuration is the foundation the meta plane builds on, and component-specific
+privileged runtime actions (harness-instance lifecycle) extend this channel as
+they are designed.
+
 The current channel has one operation:
 
 ```text
