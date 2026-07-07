@@ -12,7 +12,12 @@
 use nota::{Block, NotaBlock, NotaDecode, NotaDecodeError, NotaEncode};
 use rkyv::{Archive, Deserialize as RkyvDeserialize, Serialize as RkyvSerialize};
 use signal_frame::signal_channel;
-pub use signal_harness::HarnessDaemonConfiguration;
+pub use signal_harness::{
+    CapabilityProfile, ClaudeSessionIdentifier, CodexContinuationIdentifier, ContinuationHandle,
+    ContinuationRequest, EffortRequest, HarnessDaemonConfiguration, ModelRequest,
+    ModelResolutionRequest, ModelResolved, ModelSelector, ModelUnavailable, ModelUnavailableReason,
+    NamedModel, PiContinuationIdentifier,
+};
 
 #[derive(
     Archive,
@@ -112,10 +117,13 @@ pub struct RequestUnimplemented {
 signal_channel! {
     channel MetaHarness {
         operation Configure(HarnessDaemonConfiguration),
+        operation ResolveModel(ModelResolutionRequest),
     }
     reply MetaHarnessReply {
         Configured(Configured),
         ConfigurationRejected(ConfigurationRejected),
+        ModelResolved(ModelResolved),
+        ModelUnavailable(ModelUnavailable),
         RequestUnimplemented(RequestUnimplemented),
     }
 }
@@ -130,5 +138,11 @@ pub type ChannelReply = MetaHarnessReply;
 impl From<HarnessDaemonConfiguration> for MetaHarnessRequest {
     fn from(payload: HarnessDaemonConfiguration) -> Self {
         Self::Configure(payload)
+    }
+}
+
+impl From<ModelResolutionRequest> for MetaHarnessRequest {
+    fn from(payload: ModelResolutionRequest) -> Self {
+        Self::ResolveModel(payload)
     }
 }

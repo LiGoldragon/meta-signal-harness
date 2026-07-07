@@ -1,7 +1,10 @@
 use meta_signal_harness::{
+    CapabilityProfile, ClaudeSessionIdentifier, CodexContinuationIdentifier,
     ConfigurationGeneration, ConfigurationRejected, ConfigurationRejectionReason, Configured,
-    HarnessDaemonConfiguration, MetaHarnessFrame, MetaHarnessFrameBody, MetaHarnessReply,
-    Operation, OperationKind, RequestUnimplemented, UnimplementedReason,
+    ContinuationHandle, ContinuationRequest, EffortRequest, HarnessDaemonConfiguration,
+    MetaHarnessFrame, MetaHarnessFrameBody, MetaHarnessReply, ModelRequest, ModelResolutionRequest,
+    ModelResolved, ModelSelector, ModelUnavailable, ModelUnavailableReason, NamedModel, Operation,
+    OperationKind, RequestUnimplemented, UnimplementedReason,
 };
 #[cfg(feature = "nota-text")]
 use nota::{NotaEncode, NotaSource};
@@ -49,6 +52,18 @@ impl MetaHarnessFixture {
         }
     }
 
+    fn model_resolution_request(&self) -> ModelResolutionRequest {
+        ModelResolutionRequest {
+            model: ModelRequest {
+                selector: ModelSelector::CapabilityProfile(CapabilityProfile::new("deep-design")),
+                effort: EffortRequest::ExtraHigh,
+            },
+            continuation: ContinuationRequest::Prefer(ContinuationHandle::Codex(
+                CodexContinuationIdentifier::new("codex-session-7"),
+            )),
+        }
+    }
+
     fn round_trip_request(&self, request: Operation) -> Operation {
         let frame = MetaHarnessFrame::new(MetaHarnessFrameBody::Request {
             exchange: self.exchange,
@@ -92,8 +107,20 @@ fn configure_request_carries_harness_daemon_configuration() {
 }
 
 #[test]
+fn resolve_model_request_carries_shared_harness_resolution_vocabulary() {
+    let fixture = MetaHarnessFixture::new();
+    let request = Operation::ResolveModel(fixture.model_resolution_request());
+
+    assert_eq!(request.kind(), OperationKind::ResolveModel);
+    assert_eq!(fixture.round_trip_request(request.clone()), request);
+}
+
+#[test]
 fn meta_harness_request_heads_are_contract_local_operations() {
-    assert_eq!(<Operation as SignalOperationHeads>::HEADS, &["Configure"]);
+    assert_eq!(
+        <Operation as SignalOperationHeads>::HEADS,
+        &["Configure", "ResolveModel"]
+    );
 }
 
 #[test]
@@ -106,8 +133,21 @@ fn reply_variants_round_trip() {
         MetaHarnessReply::ConfigurationRejected(ConfigurationRejected {
             reason: ConfigurationRejectionReason::ManagerAuthorityRequired,
         }),
+        MetaHarnessReply::ModelResolved(ModelResolved {
+            harness: HarnessName::new("designer"),
+            harness_kind: HarnessKind::Claude,
+            model: NamedModel::new("claude-sonnet-4"),
+            effort: EffortRequest::High,
+            continuation: ContinuationHandle::Claude(ClaudeSessionIdentifier::new(
+                "claude-session-1",
+            )),
+        }),
+        MetaHarnessReply::ModelUnavailable(ModelUnavailable {
+            request: fixture.model_resolution_request(),
+            reason: ModelUnavailableReason::ProviderUnavailable,
+        }),
         MetaHarnessReply::RequestUnimplemented(RequestUnimplemented {
-            operation: OperationKind::Configure,
+            operation: OperationKind::ResolveModel,
             reason: UnimplementedReason::DependencyNotReady,
         }),
     ];
@@ -127,13 +167,21 @@ fn configuration_generation_projects_to_integer() {
 #[test]
 fn meta_harness_operations_encode_as_contract_local_nota_heads() {
     let fixture = MetaHarnessFixture::new();
-    let request = Operation::Configure(fixture.configuration());
-    let text = request.to_nota();
+    let requests = [
+        Operation::Configure(fixture.configuration()),
+        Operation::ResolveModel(fixture.model_resolution_request()),
+    ];
 
-    assert!(text.starts_with("(Configure"));
+    for request in requests {
+        let text = request.to_nota();
+        assert!(
+            text.starts_with(&format!("({:?}", request.kind())),
+            "operation should encode with its contract-local head: {text}",
+        );
 
-    let decoded = NotaSource::new(&text)
-        .parse::<Operation>()
-        .expect("decode request nota");
-    assert_eq!(decoded, request);
+        let decoded = NotaSource::new(&text)
+            .parse::<Operation>()
+            .expect("decode request nota");
+        assert_eq!(decoded, request);
+    }
 }

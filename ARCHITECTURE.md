@@ -20,18 +20,25 @@ configuration is the foundation the meta plane builds on, and component-specific
 privileged runtime actions (harness-instance lifecycle) extend this channel as
 they are designed.
 
-The current channel has one operation:
+The current channel has two operations:
 
 ```text
 MetaHarnessRequest                         MetaHarnessReply
-└─ Configure(HarnessDaemonConfiguration)   ├─ Configured
-                                           ├─ ConfigurationRejected
+├─ Configure(HarnessDaemonConfiguration)   ├─ Configured
+└─ ResolveModel(ModelResolutionRequest)    ├─ ConfigurationRejected
+                                           ├─ ModelResolved
+                                           ├─ ModelUnavailable
                                            └─ RequestUnimplemented
 ```
 
-`HarnessDaemonConfiguration` is imported from `signal-harness`. The startup
-binary file and the meta reconfiguration operation use the same typed record;
-configuration never arrives as flags.
+`HarnessDaemonConfiguration` and the model-resolution nouns are imported from
+`signal-harness`. The startup binary file and the meta reconfiguration
+operation use the same typed record; configuration never arrives as flags.
+`ResolveModel` is schema-only here: the `harness` component owns exact-model or
+capability/profile resolution, effort support checks, provider availability,
+and continuation validation. If a request cannot be served, the reply is the
+shared typed `ModelUnavailable` value and orchestrate decides retry,
+escalation, or fallback.
 
 ## Boundaries
 
@@ -39,13 +46,18 @@ This crate owns:
 
 - the meta request and reply vocabulary for `harness`;
 - typed configuration-generation and rejection records;
+- the privileged schema operation that asks `harness` to resolve a model and
+  validate fresh/prefer/require continuation policy using `signal-harness`
+  nouns;
 - NOTA and rkyv derives for the meta contract.
 
 This crate does not own:
 
 - the `harness` daemon runtime;
 - ordinary delivery or transcript traffic;
+- model-to-provider resolution logic;
 - adapter launch or delivery behavior;
+- session-reuse policy, retry, escalation, or fallback decisions;
 - engine-management supervision protocol details.
 
 ## Invariants
@@ -56,6 +68,8 @@ This crate does not own:
   mirror type is allowed.
 - Runtime reconfiguration may be rejected by the daemon until `harness` owns a
   hot-configuration reducer, but the rejection is typed.
+- Model resolution uses shared `signal-harness` nouns; no mirrored local model,
+  effort, continuation, or unavailable-reason types are allowed.
 - Future privileged harness-instance lifecycle operations extend this meta
   contract only after their authority boundary is concrete in `harness`.
 
