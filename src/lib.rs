@@ -13,10 +13,12 @@ use nota::{Block, NotaBlock, NotaDecode, NotaDecodeError, NotaEncode};
 use rkyv::{Archive, Deserialize as RkyvDeserialize, Serialize as RkyvSerialize};
 use signal_frame::signal_channel;
 pub use signal_harness::{
-    CapabilityProfile, ClaudeSessionIdentifier, CodexContinuationIdentifier, ContinuationHandle,
-    ContinuationRequest, EffortRequest, HarnessDaemonConfiguration, ModelRequest,
-    ModelResolutionRequest, ModelResolved, ModelSelector, ModelUnavailable, ModelUnavailableReason,
-    NamedModel, PiContinuationIdentifier,
+    AgentIdentityToken, CapabilityProfile, ClaudeSessionIdentifier, CodexContinuationIdentifier,
+    ContinuationHandle, ContinuationRequest, EffortRequest, HarnessDaemonConfiguration,
+    InitialPrompt, ModelRequest, ModelResolutionRequest, ModelResolved, ModelSelector,
+    ModelUnavailable, ModelUnavailableReason, NamedModel, PiContinuationIdentifier,
+    SessionDirectory, SessionLaunchRefusalReason, SessionLaunchRefused, SessionLaunchRequest,
+    SessionLaunched,
 };
 
 #[derive(
@@ -118,12 +120,15 @@ signal_channel! {
     channel MetaHarness {
         operation Configure(HarnessDaemonConfiguration),
         operation ResolveModel(ModelResolutionRequest),
+        operation LaunchSession(SessionLaunchRequest),
     }
     reply MetaHarnessReply {
         Configured(Configured),
         ConfigurationRejected(ConfigurationRejected),
         ModelResolved(ModelResolved),
         ModelUnavailable(ModelUnavailable),
+        SessionLaunched(SessionLaunched),
+        SessionLaunchRefused(SessionLaunchRefused),
         RequestUnimplemented(RequestUnimplemented),
     }
 }
@@ -144,5 +149,11 @@ impl From<HarnessDaemonConfiguration> for MetaHarnessRequest {
 impl From<ModelResolutionRequest> for MetaHarnessRequest {
     fn from(payload: ModelResolutionRequest) -> Self {
         Self::ResolveModel(payload)
+    }
+}
+
+impl From<SessionLaunchRequest> for MetaHarnessRequest {
+    fn from(payload: SessionLaunchRequest) -> Self {
+        Self::LaunchSession(payload)
     }
 }

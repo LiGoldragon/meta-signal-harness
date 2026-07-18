@@ -12,7 +12,10 @@ use signal_frame::{
     ExchangeIdentifier, ExchangeLane, LaneSequence, NonEmpty, Reply, RequestPayload, SessionEpoch,
     SignalOperationHeads, SubReply,
 };
-use signal_harness::{HarnessInstanceConfiguration, HarnessKind, HarnessName, TerminalSocketPath};
+use signal_harness::{
+    AgentIdentityToken, HarnessInstanceConfiguration, HarnessKind, HarnessName, InitialPrompt,
+    SessionLaunchRequest, TerminalSocketPath,
+};
 use signal_persona::{
     DomainSocketMode, DomainSocketPath, EngineManagementSocketMode, EngineManagementSocketPath,
     OwnerIdentity,
@@ -119,8 +122,22 @@ fn resolve_model_request_carries_shared_harness_resolution_vocabulary() {
 fn meta_harness_request_heads_are_contract_local_operations() {
     assert_eq!(
         <Operation as SignalOperationHeads>::HEADS,
-        &["Configure", "ResolveModel"]
+        &["Configure", "ResolveModel", "LaunchSession"]
     );
+}
+
+#[test]
+fn launch_session_request_carries_shared_launch_vocabulary() {
+    let fixture = MetaHarnessFixture::new();
+    let request = Operation::LaunchSession(SessionLaunchRequest {
+        harness_kind: HarnessKind::Pi,
+        agent_identity: AgentIdentityToken::new("xk3f"),
+        initial_prompt: InitialPrompt::new("You are agent xk3f. Map the repo."),
+        continuation: ContinuationRequest::Fresh,
+    });
+
+    assert_eq!(request.kind(), OperationKind::LaunchSession);
+    assert_eq!(fixture.round_trip_request(request.clone()), request);
 }
 
 #[test]
