@@ -13,7 +13,7 @@ use nota::{Block, NotaBlock, NotaDecode, NotaDecodeError, NotaEncode};
 use rkyv::{Archive, Deserialize as RkyvDeserialize, Serialize as RkyvSerialize};
 use signal_frame::signal_channel;
 pub use signal_harness::{
-    AgentIdentityToken, CapabilityProfile, ClaudeSessionIdentifier, CodexContinuationIdentifier,
+    AgentIdentityToken, CapabilityProfile, HarnessKind, ClaudeSessionIdentifier, CodexContinuationIdentifier,
     ContinuationHandle, ContinuationRequest, EffortRequest, HarnessDaemonConfiguration,
     InitialPrompt, ModelRequest, ModelResolutionRequest, ModelResolved, ModelSelector,
     ModelUnavailable, ModelUnavailableReason, NamedModel, PiContinuationIdentifier,
