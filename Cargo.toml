@@ -1,6 +1,6 @@
 [package]
 name         = "meta-signal-harness"
-version      = "0.2.2"
+version      = "0.2.3"
 edition      = "2024"
 rust-version = "1.85"
 license      = "MIT OR Apache-2.0"
@@ -19,7 +19,7 @@ nota-text = ["signal-frame/nota-text"]
 [dependencies]
 nota = { git = "https://github.com/LiGoldragon/nota.git", rev = "ce7c564de0a0518eaa1938d55dccc460a67cadb4" }
 signal-frame = { git = "https://github.com/LiGoldragon/signal-frame.git", rev = "91e675298b79ec2aab2e0714a5e3e5b2d6d07339" }
-signal-harness = { git = "https://github.com/LiGoldragon/signal-harness.git", rev = "ce77cfb5824ded91b5522b63dd08a4d7914a86e8" }
+signal-harness = { git = "https://github.com/LiGoldragon/signal-harness.git", rev = "eda25f52aa84852d5c79105ff222bfa690cc5c94" }
 rkyv         = { version = "0.8", default-features = false, features = ["std", "bytecheck", "little_endian", "pointer_width_32", "unaligned"] }
 thiserror    = "2"
 
