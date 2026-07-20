@@ -73,6 +73,16 @@ This crate does not own:
 - Future privileged harness-instance lifecycle operations extend this meta
   contract only after their authority boundary is concrete in `harness`.
 
+## Compatibility release family
+
+The `HarnessContractCompatibility` release pins its runtime contract family to
+immutable revisions: Nota 0.5.1, Signal Frame 0.3.1, Signal Harness 0.4.1,
+and Signal Persona 0.2.1. This preserves the existing meta payloads and wire
+surface while preventing a moving dependency selector from introducing a
+second NOTA trait family into a consumer graph. Build-time generator revisions
+remain selected by checked-artifact freshness; this crate has no checked-in
+generated Rust artifact or build script.
+
 ## Code Map
 
 ```text
