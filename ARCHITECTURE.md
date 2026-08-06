@@ -16,19 +16,18 @@ component has exactly two contracts: the ordinary `signal-<component>` working
 signal and the meta `meta-signal-<component>` policy signal. `meta-signal-harness`
 is the authority surface the Persona manager uses to configure the
 `harness-daemon`; before it, `harness` had only its ordinary contract. Daemon
-configuration is the foundation the meta plane builds on, and component-specific
-privileged runtime actions (harness-instance lifecycle) extend this channel as
-they are designed.
+configuration is the foundation the meta plane builds on; model resolution and
+harness-instance launch are its current privileged runtime requests.
 
-The current channel has two operations:
+The current channel has three operations:
 
 ```text
-MetaHarnessRequest                         MetaHarnessReply
-├─ Configure(HarnessDaemonConfiguration)   ├─ Configured
-└─ ResolveModel(ModelResolutionRequest)    ├─ ConfigurationRejected
-                                           ├─ ModelResolved
-                                           ├─ ModelUnavailable
-                                           └─ RequestUnimplemented
+Configure(HarnessDaemonConfiguration)
+└─ Configured | ConfigurationRejected | RequestUnimplemented
+ResolveModel(ModelResolutionRequest)
+└─ ModelResolved | ModelUnavailable | RequestUnimplemented
+LaunchSession(SessionLaunchRequest)
+└─ SessionLaunched | SessionLaunchRefused | RequestUnimplemented
 ```
 
 `HarnessDaemonConfiguration` and the model-resolution nouns are imported from
@@ -40,6 +39,18 @@ and continuation validation. If a request cannot be served, the reply is the
 shared typed `ModelUnavailable` value and orchestrate decides retry,
 escalation, or fallback.
 
+`LaunchSession` is likewise schema-only here. Its request carries a concrete
+`HarnessKind`, orchestrator-minted `AgentIdentityToken`, `InitialPrompt`, and
+continuation policy. Its reply is either `SessionLaunched`, the typed
+`SessionLaunchRefused`, or `RequestUnimplemented`; process creation remains
+runtime behavior owned by `harness`.
+
+The family wire allocation is explicit: this meta contract is contract id `2`,
+wire revision `1`. Request route roots are the declared operation ordinals
+(`Configure = 0`, `ResolveModel = 1`, `LaunchSession = 2`) with variant `0`.
+Replies retain the root of the operation they answer. The short header and the
+typed frame body are tested together.
+
 ## Boundaries
 
 This crate owns:
@@ -49,7 +60,7 @@ This crate owns:
 - the privileged schema operation that asks `harness` to resolve a model and
   validate fresh/prefer/require continuation policy using `signal-harness`
   nouns;
-- NOTA and rkyv derives for the meta contract.
+- opt-in Dotos and always-on rkyv derives for the meta contract.
 
 This crate does not own:
 
@@ -70,11 +81,16 @@ This crate does not own:
   hot-configuration reducer, but the rejection is typed.
 - Model resolution uses shared `signal-harness` nouns; no mirrored local model,
   effort, continuation, or unavailable-reason types are allowed.
-- Future privileged harness-instance lifecycle operations extend this meta
-  contract only after their authority boundary is concrete in `harness`.
+- Session launch uses shared `signal-harness` nouns; no mirrored local harness
+  kind, identity, prompt, continuation, result, or refusal types are allowed.
+- Default builds contain no textual codec. Dotos projection is enabled only by
+  `dotos-text`.
+- Every repository dependency is an exact immutable revision.
 
 ## Code Map
 
 ```text
-src/lib.rs    payloads, signal_channel! declaration, and component aliases
+src/lib.rs                 payloads, bound channel declaration, public aliases
+examples/canonical.dotos   canonical textual policy values
+tests/round_trip.rs        request/reply short-header and body witnesses
 ```

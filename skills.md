@@ -16,5 +16,11 @@ Rules:
 
 - Keep the crate contract-only. Do not add runtime code.
 - Use `HarnessDaemonConfiguration` from `signal-harness`.
+- Import model-resolution and session-launch vocabulary from `signal-harness`
+  by identity; do not mirror producer types.
 - Keep operation names contract-local and authority-shaped.
-- Add round-trip witnesses when adding operations or payload variants.
+- Keep Dotos projection opt-in and keep the default binary contract free of a
+  textual codec.
+- Pin every repository dependency to an exact revision.
+- Add short-header/body, rkyv, and Dotos round-trip witnesses when adding
+  operations or payload variants.

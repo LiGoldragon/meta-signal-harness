@@ -1,26 +1,36 @@
-//! Meta signal contract — privileged `harness` daemon configuration.
+//! Meta signal contract — privileged `harness` policy operations.
 //!
-//! Ordinary harness delivery, prompt, and transcript traffic lives in
-//! `signal-harness`. This crate carries the meta plane: the authenticated
-//! `Configure` operation that applies `harness`'s typed daemon configuration.
-//!
-//! The basic meta operation of every component is daemon configuration — the
-//! `HarnessDaemonConfiguration` the Persona manager encodes is itself the
-//! binary startup message, and later reconfiguration arrives over this meta
-//! plane as the same typed record, never as flags.
+//! Ordinary delivery and observation traffic belongs to `signal-harness`.
+//! This contract carries authenticated daemon configuration, model
+//! resolution, and harness-session launch requests. Runtime policy and
+//! behavior remain in `harness`.
 
-use nota::{Block, NotaBlock, NotaDecode, NotaDecodeError, NotaEncode};
+#[cfg(feature = "dotos-text")]
+use dotos::{DotosDecode, DotosEncode};
 use rkyv::{Archive, Deserialize as RkyvDeserialize, Serialize as RkyvSerialize};
 use signal_frame::signal_channel;
 pub use signal_harness::{
-    AgentIdentityToken, CapabilityProfile, HarnessKind, ClaudeSessionIdentifier, CodexContinuationIdentifier,
+    AgentIdentityToken, CapabilityProfile, ClaudeSessionIdentifier, CodexContinuationIdentifier,
     ContinuationHandle, ContinuationRequest, EffortRequest, HarnessDaemonConfiguration,
-    InitialPrompt, ModelRequest, ModelResolutionRequest, ModelResolved, ModelSelector,
-    ModelUnavailable, ModelUnavailableReason, NamedModel, PiContinuationIdentifier,
+    HarnessKind, HarnessName, InitialPrompt, ModelRequest, ModelResolutionRequest, ModelResolved,
+    ModelSelector, ModelUnavailable, ModelUnavailableReason, NamedModel, PiContinuationIdentifier,
     SessionDirectory, SessionLaunchRefusalReason, SessionLaunchRefused, SessionLaunchRequest,
     SessionLaunched,
 };
 
+/// The meta Harness contract occupies the second wire seat in its family.
+pub enum MetaHarnessWire {}
+
+impl signal_frame::WireContract for MetaHarnessWire {
+    const BINDING: signal_frame::ContractBinding = signal_frame::ContractBinding::new(
+        signal_frame::ContractId::new(
+            core::num::NonZeroU32::new(2).expect("the meta Harness contract id is non-zero"),
+        ),
+        signal_frame::WireRevision::new(core::num::NonZeroU16::MIN),
+    );
+}
+
+#[cfg_attr(feature = "dotos-text", derive(DotosEncode, DotosDecode))]
 #[derive(
     Archive,
     RkyvSerialize,
@@ -46,78 +56,42 @@ impl ConfigurationGeneration {
     }
 }
 
-impl NotaDecode for ConfigurationGeneration {
-    fn from_nota_block(block: &Block) -> Result<Self, NotaDecodeError> {
-        Ok(Self(NotaBlock::new(block).parse_integer()?))
-    }
-}
-
-impl NotaEncode for ConfigurationGeneration {
-    fn to_nota(&self) -> String {
-        self.0.to_string()
-    }
-}
-
-#[derive(
-    Archive, RkyvSerialize, RkyvDeserialize, NotaEncode, NotaDecode, Debug, Clone, PartialEq, Eq,
-)]
+#[cfg_attr(feature = "dotos-text", derive(DotosEncode, DotosDecode))]
+#[derive(Archive, RkyvSerialize, RkyvDeserialize, Debug, Clone, PartialEq, Eq)]
 pub struct Configured {
     pub generation: ConfigurationGeneration,
 }
 
-#[derive(
-    Archive,
-    RkyvSerialize,
-    RkyvDeserialize,
-    NotaEncode,
-    NotaDecode,
-    Debug,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
-    Hash,
-)]
+#[cfg_attr(feature = "dotos-text", derive(DotosEncode, DotosDecode))]
+#[derive(Archive, RkyvSerialize, RkyvDeserialize, Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum ConfigurationRejectionReason {
     ManagerAuthorityRequired,
     MalformedConfiguration,
     UnsupportedConfiguration,
 }
 
-#[derive(
-    Archive, RkyvSerialize, RkyvDeserialize, NotaEncode, NotaDecode, Debug, Clone, PartialEq, Eq,
-)]
+#[cfg_attr(feature = "dotos-text", derive(DotosEncode, DotosDecode))]
+#[derive(Archive, RkyvSerialize, RkyvDeserialize, Debug, Clone, PartialEq, Eq)]
 pub struct ConfigurationRejected {
     pub reason: ConfigurationRejectionReason,
 }
 
-#[derive(
-    Archive,
-    RkyvSerialize,
-    RkyvDeserialize,
-    NotaEncode,
-    NotaDecode,
-    Debug,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
-    Hash,
-)]
+#[cfg_attr(feature = "dotos-text", derive(DotosEncode, DotosDecode))]
+#[derive(Archive, RkyvSerialize, RkyvDeserialize, Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum UnimplementedReason {
     NotBuiltYet,
     DependencyNotReady,
 }
 
+#[cfg_attr(feature = "dotos-text", derive(DotosEncode, DotosDecode))]
 #[derive(Archive, RkyvSerialize, RkyvDeserialize, Debug, Clone, PartialEq, Eq)]
-#[cfg_attr(feature = "nota-text", derive(NotaEncode, NotaDecode))]
 pub struct RequestUnimplemented {
     pub operation: OperationKind,
     pub reason: UnimplementedReason,
 }
 
 signal_channel! {
-    channel MetaHarness {
+    channel MetaHarness contract MetaHarnessWire {
         operation Configure(HarnessDaemonConfiguration),
         operation ResolveModel(ModelResolutionRequest),
         operation LaunchSession(SessionLaunchRequest),
@@ -136,9 +110,8 @@ signal_channel! {
 pub type MetaHarnessRequest = Operation;
 pub type MetaHarnessFrame = Frame;
 pub type MetaHarnessFrameBody = FrameBody;
+pub type MetaHarnessReplyEnvelope = ReplyEnvelope;
 pub type MetaHarnessRequestBuilder = RequestBuilder;
-pub type ChannelRequest = Operation;
-pub type ChannelReply = MetaHarnessReply;
 
 impl From<HarnessDaemonConfiguration> for MetaHarnessRequest {
     fn from(payload: HarnessDaemonConfiguration) -> Self {

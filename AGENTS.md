@@ -16,4 +16,4 @@ prompt, transcript, and lifecycle observation traffic stays in
   a second local mirror of `HarnessDaemonConfiguration`.
 - Keep meta operations authority-shaped and closed. Add new operations only
   when the `harness` component has a concrete policy boundary for them.
-- Keep NOTA text behind the crate's `nota-text` feature for CLI/tooling edges.
+- Keep Dotos text behind the crate's opt-in `dotos-text` feature.

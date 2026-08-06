@@ -1,0 +1,4 @@
+(ResolveModel {{CapabilityProfile.deep-design ExtraHigh} Prefer.Codex.codex-session-7})
+(LaunchSession {Pi xk3f (|You are agent xk3f. Map the repo.|) Fresh})
+(ModelUnavailable {{{CapabilityProfile.deep-design ExtraHigh} Prefer.Codex.codex-session-7} ProviderUnavailable})
+(SessionLaunchRefused {{Pi xk3f (|You are agent xk3f. Map the repo.|) Fresh} LauncherUnavailable (Pi launcher is offline)})
