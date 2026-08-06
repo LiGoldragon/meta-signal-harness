@@ -8,17 +8,20 @@ fn runtime_tree_is_one_current_signal_family_without_historical_codec() {
         .expect("run cargo tree");
     assert!(output.status.success());
     let tree = String::from_utf8(output.stdout).expect("dependency tree");
+    let lock = include_str!("../Cargo.lock");
     assert!(!tree.contains("nota"));
-    assert_eq!(tree.matches("signal-frame v0.3.0").count(), 3);
+    assert_eq!(lock.matches("name = \"signal-frame\"").count(), 1, "{tree}");
     assert!(
-        tree.contains("signal-frame.git?rev=01676293a623d97b65e320d4138c4b480c6d5dad#01676293")
+        tree.contains("signal-frame.git?rev=8aa0bcaeb29fe9e461a11706a469638d2fd109ac#8aa0bcae")
     );
-    assert!(!tree.contains("0786fbe8"));
+    for retired_frame in ["01676293", "0786fbe8", "f46872e7"] {
+        assert!(!tree.contains(retired_frame), "{tree}");
+    }
     assert!(
-        tree.contains("signal-harness.git?rev=bf9722f4fd7553b1821ce55dd04fa14efe4e7062#bf9722f4")
+        tree.contains("signal-harness.git?rev=c05eacf167b9bee5245bdf46906428c8dee47c1b#c05eacf1")
     );
     assert!(
-        tree.contains("signal-persona.git?rev=7d2568d420869aa0cded49c3c04cc0ac180e66a2#7d2568d4")
+        tree.contains("signal-persona.git?rev=2802259fb1344495b1ad3b701fe81e0b7f9df9c3#2802259f")
     );
 }
 
