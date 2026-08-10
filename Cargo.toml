@@ -23,13 +23,13 @@ dotos-text = ["dep:dotos", "signal-frame/dotos-text", "signal-harness/dotos-text
 
 [dependencies]
 signal-frame = { git = "https://github.com/LiGoldragon/signal-frame.git", rev = "8aa0bcaeb29fe9e461a11706a469638d2fd109ac", default-features = false }
-signal-harness = { git = "https://github.com/LiGoldragon/signal-harness.git", rev = "c05eacf167b9bee5245bdf46906428c8dee47c1b", default-features = false }
+signal-harness = { git = "https://github.com/LiGoldragon/signal-harness.git", rev = "cdfd4e3cd9bba8d8fab3e1d2f65490639db0069c", default-features = false }
 dotos = { package = "dotos", git = "https://github.com/LiGoldragon/dotos.git", rev = "80c7b17f7ad3cf547d2624c6a243e5de5f85c9f3", optional = true }
 rkyv         = { version = "0.8", default-features = false, features = ["std", "bytecheck", "little_endian", "pointer_width_32", "unaligned"] }
 thiserror    = "2"
 
 [dev-dependencies]
-signal-persona = { git = "https://github.com/LiGoldragon/signal-persona.git", rev = "2802259fb1344495b1ad3b701fe81e0b7f9df9c3", default-features = false }
+signal-persona = { git = "https://github.com/LiGoldragon/signal-persona.git", rev = "0baf90c8c7da11330b5e220a2a00665272ad93b3", default-features = false }
 
 [lints.rust]
 unsafe_code = "forbid"
