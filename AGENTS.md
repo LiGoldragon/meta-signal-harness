@@ -17,3 +17,9 @@ prompt, transcript, and lifecycle observation traffic stays in
 - Keep meta operations authority-shaped and closed. Add new operations only
   when the `harness` component has a concrete policy boundary for them.
 - Keep Dotos text behind the crate's opt-in `dotos-text` feature.
+
+## Protos estate status
+
+Stack: correct-new destination
+Status: active component contract, current checkout legacy-wired
+This checkout is not proof of correct-new adoption.
