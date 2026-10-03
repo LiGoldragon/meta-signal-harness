@@ -23,4 +23,4 @@ prompt, transcript, and lifecycle observation traffic stays in
 ## Protos estate status
 
 Stack: correct-new destination
-Status: active component contract on the Signal 5.0.0 family with `signal-harness` 7.0.0
+Status: active component contract on the Signal 5.0.0 family with `signal-harness` 8.0.0

@@ -135,7 +135,7 @@ dependencies = [
 
 [[package]]
 name = "meta-signal-harness"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "datom-codec",
  "ethos-zero",
@@ -299,8 +299,8 @@ dependencies = [
 
 [[package]]
 name = "signal-harness"
-version = "7.0.0"
-source = "git+https://github.com/LiGoldragon/signal-harness.git?rev=37119ef4b1fef13ea49721c1b7c4f99b69dbc6d2#37119ef4b1fef13ea49721c1b7c4f99b69dbc6d2"
+version = "8.0.0"
+source = "git+https://github.com/LiGoldragon/signal-harness.git?rev=25a2d18b81f26ee00caaaa875dce102beed5b6a5#25a2d18b81f26ee00caaaa875dce102beed5b6a5"
 dependencies = [
  "datom-codec",
  "ethos-zero",
