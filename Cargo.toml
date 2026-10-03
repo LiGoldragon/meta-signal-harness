@@ -1,35 +1,35 @@
 [package]
 name         = "meta-signal-harness"
-version      = "0.3.1"
+version      = "1.0.0"
 edition      = "2024"
 rust-version = "1.89"
 license      = "MIT OR Apache-2.0"
 repository   = "https://github.com/LiGoldragon/meta-signal-harness"
-description  = "Meta signal contract for privileged harness policy operations."
+description  = "Meta Harness Signal contract for privileged harness policy operations."
 publish      = false
+links        = "meta-signal-harness"
+build        = "build.rs"
 
 [lib]
 name = "meta_signal_harness"
 path = "src/lib.rs"
 
-[[test]]
-name = "canonical_examples"
-path = "tests/canonical_examples.rs"
-required-features = ["dotos-text"]
-
 [features]
 default = []
-dotos-text = ["dep:dotos", "signal-frame/dotos-text", "signal-harness/dotos-text"]
+datom = ["dep:datom-codec", "dep:protos", "signal/datom", "signal-harness/datom"]
 
 [dependencies]
-signal-frame = { git = "https://github.com/LiGoldragon/signal-frame.git", rev = "8aa0bcaeb29fe9e461a11706a469638d2fd109ac", default-features = false }
-signal-harness = { git = "https://github.com/LiGoldragon/signal-harness.git", rev = "cdfd4e3cd9bba8d8fab3e1d2f65490639db0069c", default-features = false }
-dotos = { package = "dotos", git = "https://github.com/LiGoldragon/dotos.git", rev = "80c7b17f7ad3cf547d2624c6a243e5de5f85c9f3", optional = true }
-rkyv         = { version = "0.8", default-features = false, features = ["std", "bytecheck", "little_endian", "pointer_width_32", "unaligned"] }
-thiserror    = "2"
+datom-codec    = { git = "https://github.com/LiGoldragon/datom-codec", rev = "6dccc76b75918a91d3370a9d4fe88aa7dd567876", optional = true }
+protos         = { git = "https://github.com/LiGoldragon/protos", rev = "171b21f65337983ab624b7b906397a4f1f92c5a3", optional = true }
+rkyv           = { version = "0.8", default-features = false, features = ["std", "bytecheck", "little_endian", "pointer_width_32", "unaligned"] }
+signal         = { git = "https://github.com/LiGoldragon/signal", rev = "7bcb0949cdaa4501651ed519625eba48e283fac0", default-features = false }
+signal-harness = { git = "https://github.com/LiGoldragon/signal-harness.git", rev = "37119ef4b1fef13ea49721c1b7c4f99b69dbc6d2", default-features = false }
 
 [dev-dependencies]
-signal-persona = { git = "https://github.com/LiGoldragon/signal-persona.git", rev = "0baf90c8c7da11330b5e220a2a00665272ad93b3", default-features = false }
+signal-persona = { git = "https://github.com/LiGoldragon/signal-persona.git", rev = "5ed07a66d473f4fff7b293102023fc26588a3d94", default-features = false }
+
+[build-dependencies]
+ethos-zero = { git = "https://github.com/LiGoldragon/ethos-zero", rev = "b232d35e03011161fe7ec9129ad99a9914413348" }
 
 [lints.rust]
 unsafe_code = "forbid"

@@ -1,0 +1,26 @@
+; The meta Harness Signal contract: privileged harness policy only.
+;
+; The Persona manager configures the harness daemon, resolves a model, and
+; launches a harness session through this surface. Ordinary delivery,
+; observation, transcript and usage traffic lives in `signal-harness`, whose
+; daemon configuration and model-resolution and session-launch vocabulary this
+; contract imports by identity rather than mirroring.
+Signal
+[ signal_harness:[ HarnessDaemonConfiguration ModelResolutionRequest ModelResolved ModelUnavailable SessionLaunchRequest SessionLaunched SessionLaunchRefused ] ]
+[ Configure.HarnessDaemonConfiguration
+  ResolveModel.ModelResolutionRequest
+  LaunchSession.SessionLaunchRequest ]
+[ Configured.Configured
+  ConfigurationRejected.ConfigurationRejected
+  ModelResolved.ModelResolved
+  ModelUnavailable.ModelUnavailable
+  SessionLaunched.SessionLaunched
+  SessionLaunchRefused.SessionLaunchRefused
+  RequestUnimplemented.RequestUnimplemented ]
+[ ConfigurationGeneration.Integer
+  Configured.{ ConfigurationGeneration }
+  ConfigurationRejectionReason.[ ManagerAuthorityRequired MalformedConfiguration UnsupportedConfiguration ]
+  ConfigurationRejected.{ ConfigurationRejectionReason }
+  MetaOperationKind.[ ConfigureDaemon ResolveHarnessModel LaunchHarnessSession ]
+  UnimplementedReason.[ NotBuiltYet DependencyNotReady ]
+  RequestUnimplemented.{ MetaOperationKind UnimplementedReason } ]

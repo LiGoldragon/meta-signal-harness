@@ -16,10 +16,11 @@ prompt, transcript, and lifecycle observation traffic stays in
   a second local mirror of `HarnessDaemonConfiguration`.
 - Keep meta operations authority-shaped and closed. Add new operations only
   when the `harness` component has a concrete policy boundary for them.
-- Keep Dotos text behind the crate's opt-in `dotos-text` feature.
+- Keep Datom text behind the crate's opt-in `datom` feature.
+- Author the contract in `ethos/signal.ethos`; regenerate, never hand-edit,
+  `src/generated/signal.rs`.
 
 ## Protos estate status
 
 Stack: correct-new destination
-Status: active component contract, current checkout legacy-wired
-This checkout is not proof of correct-new adoption.
+Status: active component contract on the Signal 5.0.0 family with `signal-harness` 7.0.0

@@ -1,0 +1,11 @@
+; Canonical Datom examples for meta-signal-harness.
+; Every line is one contract head: a Query or a Response.
+
+ResolveModel.{ { CapabilityProfile.deep-design ExtraHigh } Prefer.Codex.codex-session-7 }
+LaunchSession.{ Pi xk3f «You are agent xk3f. Map the repo.» Fresh }
+
+Configured.{ 3 }
+ConfigurationRejected.{ ManagerAuthorityRequired }
+ModelUnavailable.{ { { CapabilityProfile.deep-design ExtraHigh } Prefer.Codex.codex-session-7 } ProviderUnavailable }
+SessionLaunchRefused.{ { Pi xk3f «You are agent xk3f. Map the repo.» Fresh } LauncherUnavailable «Pi launcher is offline» }
+RequestUnimplemented.{ LaunchHarnessSession NotBuiltYet }
